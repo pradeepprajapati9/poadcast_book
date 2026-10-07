@@ -1,0 +1,441 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        color-scheme: dark;
+        --bg: #0d0a1a;
+        --surface: #141126;
+        --text: #e5e3f0;
+        --muted: #a29db8;
+        --border: rgba(255,255,255,0.1);
+        --accent: #a78bfa;
+        --card: #141126;
+        --heading: #f7f5ff;
+        --input: rgba(255,255,255,0.08);
+    }
+
+    html.light {
+        color-scheme: light;
+        --bg: #f7f6fb;
+        --surface: #ffffff;
+        --text: #1e1836;
+        --muted: #6b6484;
+        --border: rgba(30,24,54,0.08);
+        --accent: #7c3aed;
+        --card: #ffffff;
+        --heading: #1a1230;
+        --input: rgba(30,24,54,0.05);
+    }
+
+    /* Kill horizontal scroll/gap: reveal animations start off-screen (x:60)
+       and briefly widen the page until they settle — clip it at the root. */
+    html, body {
+        overflow-x: clip;
+        max-width: 100%;
+    }
+
+    body {
+        background: var(--bg);
+        color: var(--text);
+        @apply antialiased;
+    }
+
+    /* Never let a media element push the layout past the viewport. */
+    img, svg, video, canvas {
+        max-width: 100%;
+    }
+
+    /* Respect users who ask for less motion — also cuts jank on weak phones. */
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+    }
+
+    .theme-bg { background: var(--bg); }
+    .theme-surface { background: var(--surface); }
+    .theme-text { color: var(--text); }
+    .theme-muted { color: var(--muted); }
+    .theme-border { border-color: var(--border); }
+    .theme-accent { color: var(--accent); }
+    .theme-card { background: var(--card); }
+    .theme-heading { color: var(--heading); }
+    .theme-input {
+        background: var(--input);
+        border-color: var(--border);
+        color: var(--text);
+    }
+    .theme-input::placeholder {
+        color: var(--muted);
+    }
+}
+
+/*
+ * Light-mode readability layer.
+ *
+ * Most pages were written dark-first with hardcoded utilities (text-white,
+ * text-slate-300, bg-white/5, border-white/10...). In light mode those render
+ * near-invisible. Remapping them here fixes every page at once instead of
+ * rewriting ~36 components.
+ *
+ * Escape hatch: wrap anything that sits on a permanently dark surface (hero
+ * images, gradient covers) in `on-dark` and it keeps the original colours.
+ */
+/* Body / heading text */
+html.light .text-white,
+html.light .text-slate-50,
+html.light .text-slate-100,
+html.light .text-slate-200 { color: var(--heading); }
+
+html.light .text-slate-300 { color: var(--text); }
+
+/* Secondary / meta text — was low-contrast grey on dark */
+html.light .text-slate-400,
+html.light .text-slate-500,
+html.light .text-slate-600 { color: var(--muted); }
+
+/* Gold accents wash out on a light background; darken them */
+html.light .text-gold-100,
+html.light .text-gold-200,
+html.light .text-gold-300,
+html.light .text-gold-400 { color: var(--accent); }
+
+/* Translucent white fills read as invisible on white */
+html.light .bg-white\/5  { background-color: rgba(15, 23, 42, 0.04); }
+html.light .bg-white\/10 { background-color: rgba(15, 23, 42, 0.06); }
+
+html.light .border-white\/5,
+html.light .border-white\/10,
+html.light .border-white\/20,
+html.light .border-white\/30 { border-color: var(--border); }
+
+/*
+ * Dark panel backgrounds become light surfaces.
+ * Opacity variants (bg-ink-950/90, bg-black/60...) must be listed explicitly —
+ * missing one leaves a black panel with dark text on it, i.e. invisible.
+ */
+html.light .bg-ink-950,
+html.light .bg-ink-950\/95,
+html.light .bg-ink-950\/90,
+html.light .bg-ink-950\/60,
+html.light .bg-ink-900,
+html.light .bg-ink-800,
+html.light .bg-ink-800\/95,
+html.light .bg-black { background-color: var(--surface); }
+
+/* Slightly recessed panels (nested cards, chips) get a subtle tint */
+html.light .bg-ink-700,
+html.light .bg-ink-700\/60,
+html.light .bg-ink-700\/40 { background-color: rgba(15, 23, 42, 0.05); }
+
+/* Translucent black scrims */
+html.light .bg-black\/20,
+html.light .bg-black\/30,
+html.light .bg-black\/40,
+html.light .bg-black\/50,
+html.light .bg-black\/60 { background-color: rgba(15, 23, 42, 0.06); }
+
+/*
+ * Hover/focus variants are SEPARATE classes (`.hover\:bg-ink-700:hover`), so the
+ * plain `.bg-ink-700` rules above never touch them. Without these, hovering a
+ * sidebar row or a genre in the dropdown flashes the panel black in light mode.
+ */
+html.light .hover\:bg-ink-700:hover,
+html.light .hover\:bg-ink-800:hover { background-color: rgba(15, 23, 42, 0.06); }
+html.light .hover\:bg-ink-700\/40:hover { background-color: rgba(15, 23, 42, 0.04); }
+html.light .hover\:bg-black\/40:hover,
+html.light .hover\:bg-black\/50:hover { background-color: rgba(15, 23, 42, 0.08); }
+html.light .hover\:text-white:hover,
+html.light .hover\:text-slate-200:hover { color: var(--heading); }
+html.light .hover\:text-white\/80:hover,
+html.light .hover\:text-white\/70:hover { color: var(--text); }
+
+/* …and the same escape hatch, so dark surfaces keep their real hover colours */
+html.light .on-dark .hover\:bg-ink-700:hover { background-color: #1e1836; }
+html.light .on-dark .hover\:bg-ink-800:hover { background-color: #141126; }
+html.light .on-dark .hover\:bg-ink-700\/40:hover { background-color: rgba(30, 24, 54, 0.4); }
+html.light .on-dark .hover\:bg-black\/40:hover { background-color: rgba(0, 0, 0, 0.4); }
+html.light .on-dark .hover\:bg-black\/50:hover { background-color: rgba(0, 0, 0, 0.5); }
+html.light .on-dark .hover\:text-white:hover,
+html.light .on-dark .hover\:text-slate-200:hover { color: #fff; }
+html.light .on-dark .hover\:text-white\/80:hover { color: rgba(255, 255, 255, 0.8); }
+html.light .on-dark .hover\:text-white\/70:hover { color: rgba(255, 255, 255, 0.7); }
+
+/* Dark rings read as heavy outlines on light */
+html.light .ring-black,
+html.light .ring-black\/40,
+html.light .ring-black\/20,
+html.light .ring-ink-950 { --tw-ring-color: var(--border); }
+
+/*
+ * Gradient stops. Tailwind resolves these into --tw-gradient-* custom
+ * properties, so they are remapped the same way. The footer
+ * (`bg-gradient-to-b from-ink-950 to-black`) is the clearest case: without
+ * this it stays pure black while its text turns dark.
+ */
+html.light .from-ink-950,
+html.light .from-ink-950\/90,
+html.light .from-ink-950\/70,
+html.light .from-ink-800,
+html.light .from-ink-700 {
+    --tw-gradient-from: var(--surface) var(--tw-gradient-from-position);
+    --tw-gradient-to: rgb(255 255 255 / 0) var(--tw-gradient-to-position);
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
+html.light .from-black\/80 {
+    --tw-gradient-from: rgb(15 23 42 / 0.12) var(--tw-gradient-from-position);
+    --tw-gradient-to: rgb(255 255 255 / 0) var(--tw-gradient-to-position);
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
+html.light .via-ink-950\/90,
+html.light .via-ink-950\/85,
+html.light .via-ink-900,
+html.light .via-ink-800 {
+    --tw-gradient-to: rgb(255 255 255 / 0) var(--tw-gradient-to-position);
+    --tw-gradient-stops: var(--tw-gradient-from), var(--surface) var(--tw-gradient-via-position), var(--tw-gradient-to);
+}
+
+html.light .via-black\/10 {
+    --tw-gradient-to: rgb(255 255 255 / 0) var(--tw-gradient-to-position);
+    --tw-gradient-stops: var(--tw-gradient-from), rgb(15 23 42 / 0.04) var(--tw-gradient-via-position), var(--tw-gradient-to);
+}
+
+html.light .to-ink-950,
+html.light .to-ink-950\/40,
+html.light .to-ink-950\/30,
+html.light .to-ink-900,
+html.light .to-ink-800,
+html.light .to-black { --tw-gradient-to: var(--surface) var(--tw-gradient-to-position); }
+
+/* Keep genuinely-dark surfaces (hero overlays, gradient covers) intact */
+html.light .on-dark.text-white,
+html.light .on-dark .text-white,
+html.light .on-dark.text-slate-50,
+html.light .on-dark .text-slate-50,
+html.light .on-dark.text-slate-100,
+html.light .on-dark .text-slate-100,
+html.light .on-dark.text-slate-200,
+html.light .on-dark .text-slate-200,
+html.light .on-dark.text-slate-300,
+html.light .on-dark .text-slate-300 { color: #fff; }
+
+html.light .on-dark.text-slate-400,
+html.light .on-dark .text-slate-400,
+html.light .on-dark.text-slate-500,
+html.light .on-dark .text-slate-500,
+html.light .on-dark.text-slate-600,
+html.light .on-dark .text-slate-600 { color: #cbd5e1; }
+
+html.light .on-dark.text-gold-100,
+html.light .on-dark .text-gold-100 { color: #ede9fe; }
+html.light .on-dark.text-gold-200,
+html.light .on-dark .text-gold-200 { color: #ddd6fe; }
+html.light .on-dark.text-gold-300,
+html.light .on-dark .text-gold-300 { color: #c4b5fd; }
+html.light .on-dark.text-gold-400,
+html.light .on-dark .text-gold-400 { color: #a78bfa; }
+
+html.light .on-dark.bg-white\/5,
+html.light .on-dark .bg-white\/5  { background-color: rgba(255, 255, 255, 0.05); }
+html.light .on-dark.bg-white\/10,
+html.light .on-dark .bg-white\/10 { background-color: rgba(255, 255, 255, 0.1); }
+
+html.light .on-dark.bg-black\/20,
+html.light .on-dark .bg-black\/20 { background-color: rgba(0, 0, 0, 0.2); }
+html.light .on-dark.bg-black\/30,
+html.light .on-dark .bg-black\/30 { background-color: rgba(0, 0, 0, 0.3); }
+html.light .on-dark.bg-black\/40,
+html.light .on-dark .bg-black\/40 { background-color: rgba(0, 0, 0, 0.4); }
+html.light .on-dark.bg-black\/50,
+html.light .on-dark .bg-black\/50 { background-color: rgba(0, 0, 0, 0.5); }
+html.light .on-dark.bg-black\/60,
+html.light .on-dark .bg-black\/60 { background-color: rgba(0, 0, 0, 0.6); }
+
+html.light .on-dark.border-white\/5,
+html.light .on-dark .border-white\/5  { border-color: rgba(255, 255, 255, 0.05); }
+html.light .on-dark.border-white\/10,
+html.light .on-dark .border-white\/10 { border-color: rgba(255, 255, 255, 0.1); }
+html.light .on-dark.border-white\/20,
+html.light .on-dark .border-white\/20 { border-color: rgba(255, 255, 255, 0.2); }
+html.light .on-dark.border-white\/30,
+html.light .on-dark .border-white\/30 { border-color: rgba(255, 255, 255, 0.3); }
+
+html.light .on-dark.ring-black\/40,
+html.light .on-dark .ring-black\/40 { --tw-ring-color: rgba(0, 0, 0, 0.4); }
+html.light .on-dark.ring-black\/20,
+html.light .on-dark .ring-black\/20 { --tw-ring-color: rgba(0, 0, 0, 0.2); }
+
+html.light .on-dark.bg-ink-950,
+html.light .on-dark .bg-ink-950,
+html.light .on-dark.bg-black,
+html.light .on-dark .bg-black { background-color: #080611; }
+html.light .on-dark.bg-ink-950\/95,
+html.light .on-dark .bg-ink-950\/95 { background-color: rgba(8, 6, 17, 0.95); }
+html.light .on-dark.bg-ink-950\/90,
+html.light .on-dark .bg-ink-950\/90 { background-color: rgba(8, 6, 17, 0.9); }
+html.light .on-dark.bg-ink-950\/60,
+html.light .on-dark .bg-ink-950\/60 { background-color: rgba(8, 6, 17, 0.6); }
+html.light .on-dark.bg-ink-900,
+html.light .on-dark .bg-ink-900 { background-color: #0d0a1a; }
+html.light .on-dark.bg-ink-800,
+html.light .on-dark .bg-ink-800 { background-color: #141126; }
+html.light .on-dark.bg-ink-800\/95,
+html.light .on-dark .bg-ink-800\/95 { background-color: rgba(20, 17, 38, 0.95); }
+html.light .on-dark.bg-ink-700,
+html.light .on-dark .bg-ink-700 { background-color: #1e1836; }
+html.light .on-dark.bg-ink-700\/60,
+html.light .on-dark .bg-ink-700\/60 { background-color: rgba(30, 24, 54, 0.6); }
+html.light .on-dark.bg-ink-700\/40,
+html.light .on-dark .bg-ink-700\/40 { background-color: rgba(30, 24, 54, 0.4); }
+
+/*
+ * Gradients inside dark surfaces keep their original stops.
+ *
+ * Each rule needs BOTH forms: `.on-dark.from-x` (marker and gradient on the
+ * same element, e.g. BookCover) and `.on-dark .from-x` (gradient on a child).
+ * Descendant-only selectors silently miss the same-element case, which washes
+ * the covers out to white.
+ */
+html.light .on-dark.from-ink-950,
+html.light .on-dark .from-ink-950 {
+    --tw-gradient-from: #080611 var(--tw-gradient-from-position);
+    --tw-gradient-to: rgb(8 6 17 / 0) var(--tw-gradient-to-position);
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+html.light .on-dark.from-ink-950\/90,
+html.light .on-dark .from-ink-950\/90 {
+    --tw-gradient-from: rgb(8 6 17 / 0.9) var(--tw-gradient-from-position);
+    --tw-gradient-to: rgb(8 6 17 / 0) var(--tw-gradient-to-position);
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+html.light .on-dark.from-ink-950\/70,
+html.light .on-dark .from-ink-950\/70 {
+    --tw-gradient-from: rgb(8 6 17 / 0.7) var(--tw-gradient-from-position);
+    --tw-gradient-to: rgb(8 6 17 / 0) var(--tw-gradient-to-position);
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+html.light .on-dark.from-ink-800,
+html.light .on-dark .from-ink-800 {
+    --tw-gradient-from: #141126 var(--tw-gradient-from-position);
+    --tw-gradient-to: rgb(20 17 38 / 0) var(--tw-gradient-to-position);
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+html.light .on-dark.from-ink-700,
+html.light .on-dark .from-ink-700 {
+    --tw-gradient-from: #1e1836 var(--tw-gradient-from-position);
+    --tw-gradient-to: rgb(30 24 54 / 0) var(--tw-gradient-to-position);
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+html.light .on-dark.from-black\/80,
+html.light .on-dark .from-black\/80 {
+    --tw-gradient-from: rgb(0 0 0 / 0.8) var(--tw-gradient-from-position);
+    --tw-gradient-to: rgb(0 0 0 / 0) var(--tw-gradient-to-position);
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
+html.light .on-dark.via-ink-950\/90,
+html.light .on-dark .via-ink-950\/90 {
+    --tw-gradient-to: rgb(8 6 17 / 0) var(--tw-gradient-to-position);
+    --tw-gradient-stops: var(--tw-gradient-from), rgb(8 6 17 / 0.9) var(--tw-gradient-via-position), var(--tw-gradient-to);
+}
+html.light .on-dark.via-ink-950\/85,
+html.light .on-dark .via-ink-950\/85 {
+    --tw-gradient-to: rgb(8 6 17 / 0) var(--tw-gradient-to-position);
+    --tw-gradient-stops: var(--tw-gradient-from), rgb(8 6 17 / 0.85) var(--tw-gradient-via-position), var(--tw-gradient-to);
+}
+html.light .on-dark.via-ink-900,
+html.light .on-dark .via-ink-900 {
+    --tw-gradient-to: rgb(13 10 26 / 0) var(--tw-gradient-to-position);
+    --tw-gradient-stops: var(--tw-gradient-from), #0d0a1a var(--tw-gradient-via-position), var(--tw-gradient-to);
+}
+html.light .on-dark.via-ink-800,
+html.light .on-dark .via-ink-800 {
+    --tw-gradient-to: rgb(20 17 38 / 0) var(--tw-gradient-to-position);
+    --tw-gradient-stops: var(--tw-gradient-from), #141126 var(--tw-gradient-via-position), var(--tw-gradient-to);
+}
+html.light .on-dark.via-black\/10,
+html.light .on-dark .via-black\/10 {
+    --tw-gradient-to: rgb(0 0 0 / 0) var(--tw-gradient-to-position);
+    --tw-gradient-stops: var(--tw-gradient-from), rgb(0 0 0 / 0.1) var(--tw-gradient-via-position), var(--tw-gradient-to);
+}
+
+html.light .on-dark.to-ink-950,
+html.light .on-dark .to-ink-950     { --tw-gradient-to: #080611 var(--tw-gradient-to-position); }
+html.light .on-dark.to-ink-950\/40,
+html.light .on-dark .to-ink-950\/40 { --tw-gradient-to: rgb(8 6 17 / 0.4) var(--tw-gradient-to-position); }
+html.light .on-dark.to-ink-950\/30,
+html.light .on-dark .to-ink-950\/30 { --tw-gradient-to: rgb(8 6 17 / 0.3) var(--tw-gradient-to-position); }
+html.light .on-dark.to-ink-900,
+html.light .on-dark .to-ink-900     { --tw-gradient-to: #0d0a1a var(--tw-gradient-to-position); }
+html.light .on-dark.to-ink-800,
+html.light .on-dark .to-ink-800     { --tw-gradient-to: #141126 var(--tw-gradient-to-position); }
+html.light .on-dark.to-black,
+html.light .on-dark .to-black       { --tw-gradient-to: #000 var(--tw-gradient-to-position); }
+
+/*
+ * Chapter reader body — renders admin-authored HTML.
+ *
+ * These colours follow the READER's own dark/light switch, never the site
+ * theme: a reader set to dark stays dark even while the site is in light mode.
+ * Wiring this to var(--text) put dark text on the dark reader background and
+ * made chapters unreadable.
+ */
+.chapter-content {
+    @apply text-[1.05rem] leading-8;
+    color: #e2e8f0;
+}
+.chapter-content p {
+    @apply mb-5;
+}
+.chapter-content h3 {
+    @apply mb-6 text-center font-display text-2xl;
+    color: #a78bfa;
+}
+.chapter-content em {
+    color: #94a3b8;
+}
+.chapter-content img {
+    @apply my-6 w-full rounded-xl;
+}
+
+/* Reader's own light switch */
+.reader-light .chapter-content { color: #1e293b; }
+.reader-light .chapter-content h3 { color: #7c3aed; }
+.reader-light .chapter-content em { color: #475569; }
+
+/* Hide scrollbar for horizontal scroll rows (Flipkart-style chips/rails) */
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
+/*
+ * The accent ramp is now violet, so the old "dark text on gold" buttons/badges
+ * (bg-gold-500 + text-ink-950) would sit near-black on violet — unreadable.
+ * Force white text wherever the two are combined, in both themes.
+ */
+.bg-gold-500.text-ink-950,
+.bg-gold-400.text-ink-950,
+.bg-gold-600.text-ink-950 { color: #fff !important; }
+
+/* Vibrant gradient CTA — violet → magenta → coral. Used on primary buttons. */
+.btn-brand {
+    background-image: linear-gradient(135deg, #7c3aed 0%, #d946ef 48%, #f43f5e 100%);
+    color: #fff !important;
+    box-shadow: 0 10px 30px -10px rgba(124, 58, 237, 0.55);
+    transition: filter 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+.btn-brand:hover { filter: brightness(1.07) saturate(1.05); box-shadow: 0 14px 38px -10px rgba(217, 70, 239, 0.6); }
+.btn-brand:active { transform: translateY(1px); }
+
+/* Gradient headline text — a little sparkle on key section titles. */
+.text-grad {
+    background-image: linear-gradient(120deg, #7c3aed, #d946ef 60%, #f43f5e);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}

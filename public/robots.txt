@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /my-card
+Disallow: /dashboard
+Disallow: /profile
+Disallow: /login
+Disallow: /pay
+
+Sitemap: /sitemap.xml
